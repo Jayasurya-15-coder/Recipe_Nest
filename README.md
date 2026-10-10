@@ -1,23 +1,32 @@
 # RecipeNest
 
-RecipeNest is a responsive recipe-discovery website built with React. It uses TheMealDB API to search for recipes and display the matching dishes as recipe cards.
+RecipeNest is a responsive, full-stack recipe recommendation and discovery platform built with React, Redux, React Router, Node.js, and GraphQL. It connects to TheMealDB culinary archive, providing real-time dish search, pantry ingredient matching, fitness-oriented meal filtering, persistent cookbook saving, and feedback-based algorithmic personalization.
 
 ## Built Features
 
-- Search recipes by dish name.
-- Display recipe cards with the dish name and food image.
-- Fetch recipe data from TheMealDB API.
-- Show loading feedback while a search is running.
-- Display messages for empty search results and API errors.
-- Responsive layout for desktop and mobile screens.
+- **Recipe Search & Discovery:** Search recipes by dish name, browse featured meals, or explore popular culinary categories.
+- **Recipe Cards:** Responsive cards displaying recipe photography, category, cuisine origin, dietary flags, and text-only action buttons.
+- **Detailed Recipe Views:** Complete ingredient measures, step-by-step cooking instructions, publisher source links, and YouTube demonstration links.
+- **Ingredient Matcher:** Input available pantry ingredients, normalize ingredient variants, calculate match percentages, and transparently view matched vs. missing items.
+- **FitMeals:** Fitness and performance collection focusing on high-protein and vegetarian meals, accompanied by macro estimates and nutritional transparency disclaimers.
+- **Saved Recipes Cookbook:** Save and remove recipes with centralized Redux state management and browser `localStorage` persistence.
+- **Feedback & Adaptive Personalization:** Rate recipes (Excellent, Good, Average, Not suitable) and identify areas for improvement; an explainable 4-factor scoring algorithm adjusts future recommendation rankings.
+- **Multilingual Support:** Complete interface, ingredient, and measurement unit localization across English, Tamil (தமிழ்), and Hindi (हिन्दी).
+- **Strict No-Icons Design System:** Clear text-based buttons and navigation adhering to an editorial, typography-driven aesthetic.
 
 ## Technology Stack
 
-- **React** — builds the user interface.
-- **Vite** — runs the development server and builds the frontend.
-- **JavaScript** — handles search behavior and API requests.
-- **CSS** — styles the website and responsive layout.
-- **TheMealDB API** — provides recipe data.
+- **Frontend:**
+  - **React 19 & Vite** — Component architecture and development tooling.
+  - **Redux Toolkit (`@reduxjs/toolkit`, `react-redux`)** — Centralized state management for saved recipes, feedback signals, and language settings.
+  - **React Router (`react-router-dom`)** — Client-side URL routing (`/`, `/recipe/:id`, `/matcher`, `/fitmeals`, `/saved`).
+  - **Tailwind CSS** — Utility-first styling with responsive, editorial layout.
+  - **TypeScript** — Static typing across all components and services.
+- **Backend:**
+  - **Node.js & Express** — Full-stack server running Vite middlewares in development.
+  - **GraphQL (`graphql`)** — API communication layer serving queries and mutations at `/graphql`.
+- **Data Source:**
+  - **TheMealDB API** — External open recipe archive queried server-side with in-memory caching.
 
 ## Recipe Data Source: TheMealDB
 
@@ -25,87 +34,132 @@ RecipeNest uses [TheMealDB](https://www.themealdb.com/) as its recipe data sourc
 
 TheMealDB website currently reports approximately:
 
-- **793 meals**
+- **790+ meals**
 - **992 ingredients**
-- **14 meal categories** (as provided for this project)
-- **29+ international cuisines/regions** (as provided for this project)
+- **14 meal categories** (Beef, Chicken, Dessert, Lamb, Miscellaneous, Pasta, Pork, Seafood, Side, Starter, Vegan, Vegetarian, Breakfast, Goat)
+- **29+ international cuisines/regions** (Italian, Mexican, Japanese, Indian, British, French, Mediterranean, etc.)
 
-Examples of categories include Chicken, Seafood, Beef, Vegetarian, Breakfast, Pasta, and Dessert. Examples of cuisines/regions include Italian, Mexican, Japanese, Indian, British, French, and Mediterranean.
-
-**Important:** These are catalog-level figures, not a claim that every entry is displayed or searchable in the current RecipeNest interface. TheMealDB's catalog can change over time. The current application implements recipe-name search and recipe cards; pantry matching, category/cuisine filters, FitMeals, and feedback-based recommendations should only be described as available after they have been implemented and tested.
+**Integration Architecture:** Rather than calling TheMealDB directly from the browser, all requests flow through the Node.js backend via **GraphQL**. The backend fetches verified data, calculates macronutrient estimates, executes ingredient matching, and caches lookups in memory.
 
 ## API Endpoints Used
 
-TheMealDB's public V1 API includes these endpoints:
+The backend interacts with TheMealDB's public V1 API:
 
 | Purpose | Example endpoint |
 |---|---|
-| Search meals by name | `https://www.themealdb.com/api/json/v1/1/search.php?s=Arrabiata` |
+| Search meals by name | `https://www.themealdb.com/api/json/v1/1/search.php?s=chicken` |
 | Get full meal details | `https://www.themealdb.com/api/json/v1/1/lookup.php?i=52772` |
 | List categories | `https://www.themealdb.com/api/json/v1/1/categories.php` |
 | Filter by one ingredient | `https://www.themealdb.com/api/json/v1/1/filter.php?i=chicken_breast` |
 | Filter by category | `https://www.themealdb.com/api/json/v1/1/filter.php?c=Seafood` |
-| Filter by cuisine/area | `https://www.themealdb.com/api/json/v1/1/filter.php?a=Canadian` |
-| Get one random meal | `https://www.themealdb.com/api/json/v1/1/random.php` |
+| List cuisines/areas | `https://www.themealdb.com/api/json/v1/1/list.php?a=list` |
 
-The current app's built feature is recipe-name search. The other endpoints are documented here as possible API capabilities and are not necessarily connected to the interface yet.
+The client application communicates exclusively through the unified **GraphQL** endpoint:
 
-For full endpoint details and current access terms, see the [official TheMealDB API documentation](https://www.themealdb.com/api.php).
+- **Endpoint:** `POST /graphql`
+- **Queries:** `recipes`, `recipe`, `featuredRecipes`, `categories`, `matchIngredients`, `fitMeals`, `recommendations`
+- **Mutations:** `submitFeedback`
 
-## Localhost
+For full endpoint details, see the [official TheMealDB API documentation](https://www.themealdb.com/api.php).
 
-Run the project and open it at the localhost URL shown by Vite, commonly:
+## Run the Project Locally
 
-`http://localhost:5173`
+### Prerequisites
+
+- Node.js (v18 or higher recommended) and npm
+- A web browser
+- Internet access for recipe lookups
+
+### Installation
+
+Open a terminal in the project folder and run:
+
+```bash
+npm install
+npm run dev
+```
+
+The full-stack application will start and listen on port 3000:
+
+```text
+http://localhost:3000
+```
+
+### Production Build
+
+To compile and verify the production bundle:
+
+```bash
+npm run build
+```
+
+To run TypeScript verification:
+
+```bash
+npm run lint
+```
 
 ## Project Structure
 
-A typical structure for the current Vite + React application is:
+The project follows a modular, full-stack structure aligned with the Modern Web Application Development curriculum:
 
 ```text
 recipenest/
-├── public/
+├── server.ts                         # Node.js Express server + GraphQL endpoint
+├── server/
+│   ├── graphqlSchema.ts              # GraphQL schema definitions, queries & mutations
+│   ├── mealdb.ts                     # TheMealDB client & in-memory cache
+│   └── recommendationEngine.ts       # JavaScript 4-factor feedback ranking engine
 ├── src/
+│   ├── components/                   # Navbar, RecipeCard, FeedbackForm, Modals
+│   ├── pages/
+│   │   ├── Home.tsx                  # Search & featured recipe explorer
+│   │   ├── RecipeDetails.tsx         # Detailed recipe instructions & measurements
+│   │   ├── IngredientMatcher.tsx     # Pantry inventory matcher & match scores
+│   │   ├── FitMeals.tsx              # High-protein & vegetarian collections
+│   │   └── SavedRecipes.tsx          # Saved cookbook archive
+│   ├── store/
+│   │   ├── index.ts                  # Redux Toolkit store & typed hooks
+│   │   ├── savedSlice.ts             # Saved recipes state + localStorage sync
+│   │   ├── feedbackSlice.ts          # Feedback ratings & dynamic user preferences
+│   │   └── languageSlice.ts          # Selected language state
 │   ├── services/
-│   │   └── recipeApi.js
-│   ├── App.jsx
-│   ├── App.css
-│   └── main.jsx
+│   │   ├── graphqlClient.ts          # GraphQL query/mutation execution client
+│   │   ├── recipeApi.ts              # Recipe querying service functions
+│   │   ├── feedbackService.ts        # Feedback submission helper
+│   │   └── recommendationService.ts  # Personalized recommendations helper
+│   ├── i18n/
+│   │   ├── translations.ts           # UI string dictionary (EN, TA, HI)
+│   │   └── ingredientTranslations.ts # Ingredient & measurement dictionary
+│   ├── App.tsx                       # Redux Provider & BrowserRouter routing
+│   └── main.tsx                      # React DOM mount point
 ├── index.html
 ├── package.json
+├── tsconfig.json
 └── README.md
 ```
 
-Your repository may contain additional files. Update this section to match the actual project structure.
-
 ## Error Handling
 
-The interface should account for:
+The application handles common edge cases and error states:
 
-- Empty search input.
-- Searches that return no recipes.
-- Network failures or unsuccessful API responses.
-- Loading state while a request is in progress.
+- **Empty Input:** Helpful prompts when search or pantry fields are submitted blank.
+- **Empty Results:** User-friendly messages with suggestions when no recipes match a query or pantry combination.
+- **Network Failures:** Clear error cards when TheMealDB or GraphQL service encounters connection limits.
+- **Loading Indicators:** Text-based loading feedback during GraphQL query execution.
+- **Nutritional Transparency:** Explicit disclaimers clarifying that macro values are estimates based on standard raw portion weights rather than certified lab tests.
 
-If recipe results do not load, check your internet connection, the API endpoint, and the browser developer console.
+## Course & Curriculum Alignment
 
-## Current Project Scope
+This project satisfies the technical requirements for **Modern Web Application Development (19AI545 / CS3545)**:
 
-RecipeNest currently focuses on the recipe-search experience and responsive recipe cards. Features such as recipe details, saved recipes, ingredient matching, FitMeals, multilingual translations, feedback persistence, Redux, routing, GraphQL, and a Node.js backend should be listed as completed only after they are implemented and tested.
-
-## Future Improvements
-
-Potential improvements, if included in the project scope, are:
-
-- Recipe details with ingredients and instructions.
-- Saved recipes.
-- Ingredient-based matching.
-- Feedback form and personalized recommendation ranking.
-- Category and cuisine filters.
-- FitMeals collections.
-- English, Tamil, and Hindi interface translations.
-- Redux for shared application state, React Router for navigation, and GraphQL/Node.js if required by the course syllabus.
+- **React.js & Vite:** Component-based SPA with declarative forms and hooks.
+- **Redux:** Centralized state management via Redux Toolkit (`@reduxjs/toolkit`).
+- **React Router:** Standard URL routing (`react-router-dom`).
+- **Node.js Backend:** Express-based server hosting the API and static client.
+- **GraphQL:** Typed API schema with queries and mutations replacing standard REST.
+- **Client-Side Personalization:** Algorithmic ranking implemented in JavaScript without external LLM dependencies.
 
 ## License and Attribution
 
-Recipe data is provided by TheMealDB. Refer to the [official API documentation](https://www.themealdb.com/api.php) for current API access and usage requirements. Add a separate `LICENSE` file if you choose a license for your own source code.
+Recipe data and photography are provided by [TheMealDB](https://www.themealdb.com/). All product trademarks belong to their respective owners.
