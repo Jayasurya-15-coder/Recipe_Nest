@@ -1,0 +1,6 @@
+{
+  "name": "RecipeNest",
+  "description": "Recipe recommendation platform with ingredient matching, fitness meals, and feedback-based personalization built with React, Redux, React Router, Node.js, and GraphQL.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
